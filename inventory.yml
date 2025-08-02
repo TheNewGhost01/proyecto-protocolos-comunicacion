@@ -1,0 +1,23 @@
+#asegurarse de tener los paquetes necesarios de ansible para el proyecto
+sudo apt install ansible-core
+
+#En la terminal de ubuntu ejecutaremos el comando inventory.yml 
+nano inventory.yml
+
+#Dentro del archivo .yml copiaremos el siguiente script para configurar algunos permisos importantes del proyecto
+all:
+  hosts:
+    CSR1000v:
+      ansible_host: 2001:db8:acad:3::1
+  vars:
+    ansible_connection: httpapi
+    ansible_httpapi_use_ssl: true
+    ansible_httpapi_validate_certs: false
+    ansible_httpapi_port: 443
+    ansible_user: ansible
+    ansible_password: cisco123
+    ansible_network_os: restconf
+    # AÑADE ESTA LÍNEA PARA DESACTIVAR LA VERIFICACIÓN DE CLAVE SSH
+    ansible_ssh_host_key_checking: false
+
+    #Guardamos y cerramos la interfaz del nano.
