@@ -167,11 +167,11 @@ all:
     ansible_ssh_host_key_checking: false
 ```
 
-##### **Paso 6: Crear el Playbook (`playbook_ospfv3.yml`)**
+##### **Paso 6: Crear el Playbook (`playbook_configurar_ospfv3.yml`)**
 
 El playbook contiene la secuencia de tareas. Este playbook demuestra una técnica avanzada que combina dos tipos de conexión: `uri` para la API RESTCONF y `cisco.ios.ios_config` para la CLI.
 
-*   Cree el archivo `playbook_ospfv3.yml`. La clave de este playbook es la capacidad de **sobrescribir el método de conexión por tarea** usando la sección `vars`, como se muestra en el ejemplo:
+*   Cree el archivo `playbook_configurar_ospfv3.yml`. La clave de este playbook es la capacidad de **sobrescribir el método de conexión por tarea** usando la sección `vars`, como se muestra en el ejemplo:
 
 ```yaml
 # ... (tareas iniciales usando el módulo uri para RESTCONF) ...
@@ -188,7 +188,7 @@ El playbook contiene la secuencia de tareas. Este playbook demuestra una técnic
 
 # ... (más tareas) ...
 ```
-> El contenido completo del playbook se encuentra en el archivo `playbook_ospfv3.yml` de este repositorio.
+> El contenido completo del playbook se encuentra en el archivo `playbook_configurar_ospfv3.yml` de este repositorio.
 
 #### **Fase 4: Ejecución y Verificación**
 
@@ -199,7 +199,7 @@ El último paso es ejecutar la automatización y confirmar que el estado de la r
 *   Desde la terminal del nodo de control, en la carpeta del proyecto, lance el comando:
 
 ```sh
-ansible-playbook -i inventory.yml playbook_ospfv3.yml
+ansible-playbook -i inventory.yml playbook_configurar_ospfv3.yml
 ```
 
 ##### **Paso 8: Verificar el Resultado**
