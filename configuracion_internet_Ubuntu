@@ -1,0 +1,22 @@
+//Ejecutar el comando sudo para acceder al archivo .yaml despues de haber conectado un NAT al puerto e1 de la maquina Ubuntu
+sudo nano /etc/netplan/01-netcfg.yaml
+
+//Script para configurar los puertos de acceso a internet
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: true
+      optional: true
+    eth1:
+      dhcp4: true
+ 
+//Una vez copiado el script guarda y salir copiamos en el terminal de ubuntu los siguientes comando
+sudo chmod 600 /etc/netplan/*.yaml 
+sudo netplan generate
+sudo netplan apply
+ 
+ 
+//Se  verifica que haga ping con internet
+ping -c 4 8.8.8.8
