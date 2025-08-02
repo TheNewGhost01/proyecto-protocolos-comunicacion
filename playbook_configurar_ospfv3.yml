@@ -1,0 +1,133 @@
+#Acceder al archivo playbook: Es donde iran las instrucciones para la automatizacion
+nano playbook_configurar_ospfv3.yml
+ 
+#Script de automatizacion de ansible
+- name: Configurar y Activar CSR1000v paso a paso
+  hosts: CSR1000v
+  gather_facts: no
+ 
+  tasks:
+ 
+    #======================================PASOS 1, 2, 3======================================
+    - name: 1. Crear proceso OSPFv3 con router-id
+      uri:
+        url: "https://[{{ ansible_host }}]/restconf/data/Cisco-IOS-XE-native:native/router/Cisco-IOS-XE-ospfv3:ospfv3"
+        method: PATCH
+        headers: { Accept: "application/yang-data+json", Content-Type: "application/yang-data+json" }
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: yes
+        body_format: json
+        body:
+          Cisco-IOS-XE-ospfv3:ospfv3:
+            - id: 1
+              router-id: 1.1.1.1
+        status_code: 204
+        validate_certs: no
+ 
+    - name: 2a. Configurar IPv6 en interfaz GigabitEthernet1
+      uri:
+        url: "https://[{{ ansible_host }}]/restconf/data/Cisco-IOS-XE-native:native/interface/GigabitEthernet=1"
+        method: PATCH
+        headers: { Accept: "application/yang-data+json", Content-Type: "application/yang-data+json" }
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: yes
+        body_format: json
+        body:
+          Cisco-IOS-XE-native:GigabitEthernet:
+            name: "1"
+            ipv6:
+              address:
+                prefix-list:
+                  - prefix: "2001:1::1/64"
+              enable: {}
+        status_code: 204
+        validate_certs: no
+ 
+    - name: 2b. Configurar IPv6 en interfaz GigabitEthernet2 (IP CORREGIDA)
+      uri:
+        url: "https://[{{ ansible_host }}]/restconf/data/Cisco-IOS-XE-native:native/interface/GigabitEthernet=2"
+        method: PATCH
+        headers: { Accept: "application/yang-data+json", Content-Type: "application/yang-data+json" }
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: yes
+        body_format: json
+        body:
+          Cisco-IOS-XE-native:GigabitEthernet:
+            name: "2"
+            ipv6:
+              address:
+                prefix-list:
+                  - prefix: "2001:2::1/64"
+              enable: {}
+        status_code: 204
+        validate_certs: no
+ 
+    - name: 3a. Activar interfaz GigabitEthernet1 (no shutdown)
+      uri:
+        url: "https://[{{ ansible_host }}]/restconf/data/Cisco-IOS-XE-native:native/interface/GigabitEthernet=1/shutdown"
+        method: DELETE
+        headers: { Accept: "application/yang-data+json" }
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: yes
+        status_code: [204, 404]
+        validate_certs: no
+ 
+    - name: 3b. Activar interfaz GigabitEthernet2 (no shutdown)
+      uri:
+        url: "https://[{{ ansible_host }}]/restconf/data/Cisco-IOS-XE-native:native/interface/GigabitEthernet=2/shutdown"
+        method: DELETE
+        headers: { Accept: "application/yang-data+json" }
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: yes
+        status_code: [204, 404]
+        validate_certs: no
+ 
+    #=========================PASO 4: Habilitar OSPFv3=======================
+    - name: 4a. Habilitar OSPFv3 en GigabitEthernet1
+      cisco.ios.ios_config:
+        lines:
+          - ipv6 ospf 1 area 0
+        parents: interface GigabitEthernet1
+      vars:
+        ansible_connection: network_cli
+        ansible_network_os: cisco.ios.ios
+ 
+    - name: 4b. Habilitar OSPFv3 en GigabitEthernet2
+      cisco.ios.ios_config:
+        lines:
+          - ipv6 ospf 1 area 0
+        parents: interface GigabitEthernet2
+      vars:
+        ansible_connection: network_cli
+        ansible_network_os: cisco.ios.ios
+ 
+    - name: 4c. Habilitar OSPFv3 en la red de la PC (GigabitEthernet3)
+      cisco.ios.ios_config:
+        lines:
+          - ipv6 ospf 1 area 0
+        parents: interface GigabitEthernet3
+      vars:
+        ansible_connection: network_cli
+        ansible_network_os: cisco.ios.ios
+ 
+    #============================PASO 5: Verificación=================================
+    - name: 5. Verificar vecinos OSPFv3 descubiertos
+      uri:
+        url: "https://[{{ ansible_host }}]/restconf/data/Cisco-IOS-XE-ospf-oper:ospf-oper-data"
+        method: GET
+        headers: { Accept: "application/yang-data+json" }
+        url_username: "{{ ansible_user }}"
+        url_password: "{{ ansible_password }}"
+        force_basic_auth: yes
+        validate_certs: no
+        return_content: yes
+      register: ospf_neighbors
+ 
+    - name: 6. Mostrar vecinos OSPF
+      debug:
+        var: ospf_neighbors
