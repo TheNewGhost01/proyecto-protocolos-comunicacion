@@ -1,5 +1,6 @@
 # proyecto-protocolos-comunicacion
 # 🚀 Proyecto: Automatización de Red con Ansible y RESTCONF
+<img width="527" height="494" alt="image" src="https://github.com/user-attachments/assets/7a53d67c-996b-4f79-a623-e9bcd1413bda" />
 
 Este repositorio contiene la configuración y los scripts de Ansible para automatizar el despliegue del protocolo de enrutamiento OSPFv3 en una topología de red basada en Cisco CSR1000v. El objetivo es demostrar el uso de herramientas de Infraestructura como Código (IaC) para gestionar configuraciones de red complejas de manera eficiente, reproducible y escalable.
 
