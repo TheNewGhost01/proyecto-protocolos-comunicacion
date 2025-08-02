@@ -131,3 +131,9 @@ nano playbook_configurar_ospfv3.yml
     - name: 6. Mostrar vecinos OSPF
       debug:
         var: ospf_neighbors
+
+#Guardamos el script y salimos del .yml
+
+
+#En la terminal de Ubuntu Ejecutamos las intrucciones
+ansible-playbook -i inventory.yml playbook_configurar_ospfv3.yml
