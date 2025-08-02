@@ -1,0 +1,24 @@
+enable
+conf t
+hostname CSR1000v
+ipv6 unicast-routing
+username ansible privilege 15 secret cisco123
+ip http secure-server
+restconf
+end
+wr
+
+conf t
+interface GigabitEthernet3
+ipv6 address 2001:DB8:ACAD:3::1/64
+ipv6 enable
+no shutdown
+exit
+end
+wr
+
+conf t
+line vty 0 4
+login local
+end
+wr
